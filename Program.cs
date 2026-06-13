@@ -8,7 +8,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Controllers + JSON Circular Reference Fix ──────────────────
+// ── Controllers + JSON Fix ──────────────────
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -16,7 +16,7 @@ builder.Services.AddControllers()
             System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
-// ── Swagger ────────────────────────────────────────────────────
+// ── Swagger ─────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -52,16 +52,17 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// ── DB Context ──────────────────────────────
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
-// ── Repositories ───────────────────────────────────────────────
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// ── Repositories ────────────────────────────
 builder.Services.AddScoped<IKisanRepository, KisanRepository>();
 builder.Services.AddScoped<IFasalRepository, FasalRepository>();
 builder.Services.AddScoped<IOzarRepository, OzarRepository>();
 builder.Services.AddScoped<IZameenRepository, ZameenRepository>();
 
-// ── JWT Authentication ─────────────────────────────────────────
+// ── JWT Auth ────────────────────────────────
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -78,24 +79,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// ── CORS (allow your frontend origin) ─────────────────────────
+// ── CORS ────────────────────────────────────
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-       policy.AllowAnyOrigin()
-      .AllowAnyHeader()
-      .AllowAnyMethod());
-           
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod());
 });
-app.Urls.Add("http://0.0.0.0:" + Environment.GetEnvironmentVariable("PORT"));
+
+// ═════════════════ BUILD APP HERE ═════════════════
+var app = builder.Build();
+
+// ── PORT CONFIGURATION (FIXED) ───────────────
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
 app.Urls.Clear();
 app.Urls.Add($"http://0.0.0.0:{port}");
-// ══════════════════════════════════════════════════════════════
-var app = builder.Build();
-// ══════════════════════════════════════════════════════════════
 
-// ── Swagger (dev only — don't expose in production) ────────────
+// ── Middleware ──────────────────────────────
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -104,7 +105,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowFrontend");       // ← must be before Auth
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
