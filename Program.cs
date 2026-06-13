@@ -52,11 +52,9 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// ── Database ───────────────────────────────────────────────────
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")));
-
 // ── Repositories ───────────────────────────────────────────────
 builder.Services.AddScoped<IKisanRepository, KisanRepository>();
 builder.Services.AddScoped<IFasalRepository, FasalRepository>();
