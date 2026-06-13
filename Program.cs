@@ -87,7 +87,10 @@ builder.Services.AddCors(options =>
       .AllowAnyMethod());
            
 });
-
+app.Urls.Add("http://0.0.0.0:" + Environment.GetEnvironmentVariable("PORT"));
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+app.Urls.Clear();
+app.Urls.Add($"http://0.0.0.0:{port}");
 // ══════════════════════════════════════════════════════════════
 var app = builder.Build();
 // ══════════════════════════════════════════════════════════════
