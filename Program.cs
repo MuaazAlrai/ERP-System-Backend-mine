@@ -91,10 +91,10 @@ builder.Services.AddCors(options =>
 // ═════════════════ BUILD APP HERE ═════════════════
 var app = builder.Build();
 
-// ── PORT CONFIGURATION (FIXED) ───────────────
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-app.Urls.Clear();
-app.Urls.Add($"http://0.0.0.0:{port}");
+//// ── PORT CONFIGURATION (FIXED) ───────────────
+//var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+//app.Urls.Clear();
+//app.Urls.Add($"http://0.0.0.0:{port}");
 
 // ── Middleware ──────────────────────────────
 if (app.Environment.IsDevelopment())
